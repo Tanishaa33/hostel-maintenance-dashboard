@@ -1,139 +1,180 @@
-
 // src/pages/StudentDashboard.jsx
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldAlert, Zap, BarChart3, Clock, CheckCircle2, CloudUpload, AlertOctagon } from 'lucide-react';
+import {
+  ShieldAlert,
+  Zap,
+  BarChart3,
+  CheckCircle2,
+  AlertOctagon,
+} from 'lucide-react';
+
 import GlassCard from '../components/GlassCard';
-import { submitComplaint } from '../utils/api'; // Ensure this utility file exists
+import API from '../api';
 
 const StudentDashboard = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState(null);
-  
-  // NEW: State to hold form data
+
   const [formData, setFormData] = useState({
     title: '',
     category: 'Electrical',
-    description: ''
+    description: '',
   });
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const stats = [
-    { title: "Active Issues", count: 3, icon: <ShieldAlert className="text-neonBlue" /> },
-    { title: "Resolved Issues", count: 12, icon: <CheckCircle2 className="text-green-400" /> },
-    { title: "Warden Response", count: "14m", icon: <Zap className="text-yellow-400" /> }
+    {
+      title: 'Active Issues',
+      count: 3,
+      icon: <ShieldAlert className="text-blue-500" />,
+    },
+    {
+      title: 'Resolved Issues',
+      count: 12,
+      icon: <CheckCircle2 className="text-emerald-500" />,
+    },
+    {
+      title: 'Warden Response',
+      count: '14m',
+      icon: <Zap className="text-orange-500" />,
+    },
   ];
 
   const handleSubmit = async () => {
+    if (!formData.title || !formData.description) {
+      alert('Please fill all fields');
+      return;
+    }
+
     setAnalyzing(true);
     setAiAnalysis(null);
-    
+
     try {
-        // Send data to backend via our API utility
-        await submitComplaint(formData);
-        
-        // Simulate AI logic delay
-        setTimeout(() => {
-            setAnalyzing(false);
-            setAiAnalysis({
-                priority: 'High',
-                score: 8.7,
-                explanation: `AI Analysis for "${formData.title}": Safety Risk detected. Location: Hostal Block. Priority adjusted based on urgency.`
-            });
-        }, 2500);
-    } catch (err) {
-        alert("Backend not connected! Check your server.");
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("You are not logged in. Please login again.");
         setAnalyzing(false);
+        return;
+      }
+
+      const res = await API.post('/complaints', formData);
+      const complaint = res.data;
+
+      setTimeout(() => {
+        setAnalyzing(false);
+        setAiAnalysis({
+          priority: complaint.priority || 'Medium',
+          score: complaint.priority === 'High' ? 9.2 : complaint.priority === 'Medium' ? 7.0 : 4.5,
+          explanation: complaint.aiExplanation || 'Complaint submitted successfully and prioritized by AI.',
+        });
+        setFormData({ title: '', category: 'Electrical', description: '' });
+      }, 1500);
+    } catch (error) {
+      setAnalyzing(false);
+      if (error.response?.status === 401) {
+        alert("Session expired. Please login again.");
+        localStorage.removeItem("token");
+      } else {
+        alert("Failed to submit. Check backend connection.");
+      }
     }
   };
 
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
-  };
-
   return (
-    <div className="min-h-screen bg-spaceNavy p-8 text-white">
+    <div className="min-h-screen bg-emerald-50 p-8 text-slate-900">
+      {/* HEADER */}
       <header className="mb-12 flex justify-between items-center max-w-7xl mx-auto pt-10">
         <div>
-          <motion.h1 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-5xl font-extrabold tracking-tighter">
+          <motion.h1 className="text-5xl font-bold text-slate-900">
             Student Portal
           </motion.h1>
-          <p className="text-gray-400 mt-2">Manage and Track your hostel maintenance requests</p>
-        </div>
-        <div className="flex gap-4">
-            <span className="text-sm font-medium hover:text-neonBlue">Settings</span>
-            <div className="w-10 h-10 rounded-full bg-slate-900 border border-neonBlue shadow-glow flex items-center justify-center font-bold">JD</div>
+          <p className="text-slate-600">
+            Manage and Track your hostel maintenance requests
+          </p>
         </div>
       </header>
 
-      <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-7xl mx-auto">
+      {/* STATS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-7xl mx-auto">
         {stats.map((stat, i) => (
-          <GlassCard key={i} className="flex items-center gap-6">
-            <div className="p-4 bg-slate-900 rounded-full">{stat.icon}</div>
+          <GlassCard key={i} className="flex items-center gap-6 bg-white border-emerald-100 shadow-md">
+            <div className="p-3 bg-emerald-50 rounded-full">{stat.icon}</div>
             <div>
-              <p className="text-gray-400 text-sm">{stat.title}</p>
-              <p className="text-4xl font-bold mt-1 tracking-tight">{stat.count}</p>
+              <p className="text-slate-500 text-sm font-bold uppercase tracking-wider">{stat.title}</p>
+              <p className="text-3xl font-bold text-slate-900">{stat.count}</p>
             </div>
           </GlassCard>
         ))}
-      </motion.div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 max-w-7xl mx-auto">
-        <motion.div initial={{opacity: 0, y: 30}} animate={{opacity: 1, y: 0}} transition={{delay: 0.3}} className="lg:col-span-2">
-            <GlassCard>
-                <h2 className="text-3xl font-extrabold tracking-tighter mb-8 flex items-center gap-3">
-                  <AlertOctagon className="text-red-400" /> New Issue Report
-                </h2>
-                <form className="space-y-6">
-                    <div className="grid grid-cols-2 gap-6">
-                        <input name="title" onChange={handleInputChange} type="text" placeholder="Complaint Title" className="w-full bg-slate-900/40 border border-cardBorder rounded-xl p-4 text-offWhite focus:ring-1 focus:ring-neonBlue transition-colors" />
-                        <select name="category" onChange={handleInputChange} className="w-full bg-slate-900/40 border border-cardBorder rounded-xl p-4 text-gray-400">
-                            <option value="Electrical">Electrical</option>
-                            <option value="Plumbing">Plumbing</option>
-                            <option value="Internet">Internet</option>
-                        </select>
-                    </div>
-                    <textarea name="description" onChange={handleInputChange} placeholder="Describe details..." rows="4" className="w-full bg-slate-900/40 border border-cardBorder rounded-xl p-4 text-offWhite focus:ring-1 focus:ring-neonBlue"></textarea>
-                    
-                    <motion.button 
-                      type="button" 
-                      onClick={handleSubmit}
-                      disabled={analyzing}
-                      className="w-full py-5 rounded-2xl bg-gradient-to-r from-neonBlue to-electricBlue font-bold text-lg text-spaceNavy shadow-glow disabled:opacity-60 transition-all"
-                    >
-                      {analyzing ? "AI Triage Engine Analyzing..." : "Analyze & Submit Issue"}
-                    </motion.button>
-                </form>
-            </GlassCard>
-        </motion.div>
-
-        <AnimatePresence>
-        {(analyzing || aiAnalysis) && (
-            <motion.div initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 40 }} className="relative">
-              {analyzing && (
-                  <GlassCard className="h-full flex flex-col items-center justify-center text-center border-neonBlue shadow-glow">
-                      <BarChart3 size={40} className="text-neonBlue animate-pulse mb-6" />
-                      <h3 className="text-3xl font-bold">Analyzing...</h3>
-                  </GlassCard>
-              )}
-              {aiAnalysis && (
-                  <GlassCard className="h-full border-green-500/30">
-                        <h3 className="text-3xl font-bold text-green-400 mb-8">AI PRIORITY RADAR</h3>
-                        <div className="bg-slate-900 p-5 rounded-2xl mb-8 border border-cardBorder">
-                            <p className="text-7xl font-extrabold text-red-500">{aiAnalysis.score}</p>
-                            <p className="text-xl font-semibold">Priority: {aiAnalysis.priority}</p>
-                        </div>
-                        <p className="text-gray-400 text-sm">{aiAnalysis.explanation}</p>
-                  </GlassCard>
-              )}
-            </motion.div>
-        )}
-        </AnimatePresence>
       </div>
+
+      {/* FORM */}
+      <div className="max-w-4xl mx-auto">
+        <GlassCard className="bg-white border-emerald-100 shadow-lg">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-slate-900">
+            <AlertOctagon className="text-orange-500" />
+            New Issue Report
+          </h2>
+
+          <input
+            name="title"
+            value={formData.title}
+            onChange={handleInputChange}
+            placeholder="Complaint Title"
+            className="w-full p-4 mb-4 bg-slate-50 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-500/20 transition-all"
+          />
+
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleInputChange}
+            className="w-full p-4 mb-4 bg-slate-50 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-500/20 transition-all"
+          >
+            <option>Electrical</option>
+            <option>Plumbing</option>
+            <option>Internet</option>
+            <option>Furniture</option>
+            <option>Sanitation</option>
+          </select>
+
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="Describe your issue..."
+            className="w-full p-4 mb-4 bg-slate-50 border border-emerald-100 rounded-xl focus:ring-2 focus:ring-emerald-500/20 transition-all"
+            rows="4"
+          />
+
+          <button
+            onClick={handleSubmit}
+            disabled={analyzing}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 py-4 rounded-xl font-bold text-white shadow-lg transition-all"
+          >
+            {analyzing ? "AI Analysis in progress..." : "Submit Complaint"}
+          </button>
+        </GlassCard>
+      </div>
+
+      {/* AI RESPONSE */}
+      <AnimatePresence>
+        {aiAnalysis && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-10 max-w-4xl mx-auto">
+            <GlassCard className="bg-white border-emerald-200 shadow-xl">
+              <h3 className="text-xl font-bold text-emerald-700">AI Analysis Complete</h3>
+              <p className="text-4xl font-bold mt-4 text-slate-900">{aiAnalysis.score}</p>
+              <p className="mt-2 text-slate-700 font-semibold">Priority: {aiAnalysis.priority}</p>
+              <p className="text-slate-600 mt-3">{aiAnalysis.explanation}</p>
+            </GlassCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

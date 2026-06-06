@@ -1,20 +1,20 @@
-const User = require("../model/User");
+const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// ================= REGISTER =================
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    const exists = await User.findOne({ email });
+    const userExists = await User.findOne({ email });
 
-    if (exists) {
-      return res.status(400).json({
-        message: "User already exists",
-      });
+    if (userExists) {
+      return res.status(400).json({ message: "User already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
       name,
@@ -23,44 +23,60 @@ const registerUser = async (req, res) => {
       role,
     });
 
-    res.status(201).json(user);
+    res.status(201).json({
+      message: "User registered successfully",
+      userId: user._id,
+    });
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ message: error.message });
   }
 };
 
+// ================= LOGIN =================
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-
-    if (
-      user &&
-      (await bcrypt.compare(password, user.password))
-    ) {
-      const token = jwt.sign(
-        {
-          id: user._id,
-        },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "7d",
-        }
-      );
-
+    // --- HACKATHON DEMO BYPASS ---
+    if (email === "demo@hostel.com" && password === "demo123") {
       return res.json({
-        token,
-        role: user.role,
-        name: user.name,
+        token: "demo-bypass-token",
+        role: "student",
+        message: "Login successful (Demo Mode)",
       });
     }
 
-    res.status(401).json({
-      message: "Invalid Credentials",
+    // find user
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // check password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // create token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      token,
+      role: user.role,
+      message: "Login successful",
     });
   } catch (error) {
-    res.status(500).json(error.message);
+    res.status(500).json({ message: error.message });
   }
 };
 

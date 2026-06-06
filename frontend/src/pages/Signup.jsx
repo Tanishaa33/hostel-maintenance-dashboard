@@ -1,73 +1,174 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import API from '../api';
 
 const Signup = () => {
+  const navigate = useNavigate();
+
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('student');
+  const [hostelBlock, setHostelBlock] = useState('');
+  const [roomNo, setRoomNo] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignup = async () => {
+    try {
+      await API.post('/auth/register', {
+        name,
+        email,
+        password,
+        role,
+        hostelBlock,
+        roomNo,
+      });
+
+      alert('Registration Successful');
+
+      setName('');
+      setEmail('');
+      setPassword('');
+      setHostelBlock('');
+      setRoomNo('');
+      setRole('student');
+
+      navigate('/login');
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || 'Registration Failed');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#050816] flex items-center justify-center relative overflow-hidden py-10">
+    <div className="min-h-screen bg-emerald-50 flex items-center justify-center relative overflow-hidden py-10">
       {/* Background Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#00D4FF]/10 blur-[120px] rounded-full pointer-events-none"></div>
-      
-      <motion.div 
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-200/30 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-200/30 blur-[120px] rounded-full pointer-events-none"></div>
+
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg bg-[#0F172A]/60 backdrop-blur-xl border border-white/10 p-8 rounded-3xl z-10 shadow-2xl mx-4"
+        className="w-full max-w-lg bg-white border border-emerald-100 p-8 rounded-3xl z-10 shadow-xl mx-4"
       >
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
-          <p className="text-gray-400 text-sm">Join the AI-powered campus platform</p>
+          <h2 className="text-3xl font-bold text-slate-900 mb-2">
+            Create Account
+          </h2>
+          <p className="text-slate-500 text-sm">
+            Join the AI-powered campus platform
+          </p>
         </div>
 
-        <form className="space-y-5">
+        <form
+          className="space-y-5"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSignup();
+          }}
+        >
+          {/* Name + Role */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-gray-400 text-xs mb-1">Full Name</label>
-              <input type="text" placeholder="John Doe" className="w-full bg-[#050816] border border-gray-700 rounded-xl p-3 text-white focus:outline-none focus:border-[#00D4FF] transition-colors" />
+              <label className="block text-slate-700 text-xs mb-1 font-medium">
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-slate-50 border border-emerald-100 rounded-xl p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                required
+              />
             </div>
             <div>
-              <label className="block text-gray-400 text-xs mb-1">Role</label>
-              <select className="w-full bg-[#050816] border border-gray-700 rounded-xl p-3 text-white focus:outline-none focus:border-[#00D4FF] transition-colors">
-                <option>Student</option>
-                <option>Maintenance Staff</option>
-                <option>Hostel Admin</option>
+              <label className="block text-slate-700 text-xs mb-1 font-medium">
+                Role
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full bg-slate-50 border border-emerald-100 rounded-xl p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              >
+                <option value="student">Student</option>
+                <option value="admin">Hostel Admin</option>
               </select>
             </div>
           </div>
 
+          {/* Hostel Info */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-gray-400 text-xs mb-1">Hostel Block</label>
-              <input type="text" placeholder="Block A" className="w-full bg-[#050816] border border-gray-700 rounded-xl p-3 text-white focus:outline-none focus:border-[#00D4FF] transition-colors" />
+              <label className="block text-slate-700 text-xs mb-1 font-medium">
+                Hostel Block
+              </label>
+              <input
+                type="text"
+                value={hostelBlock}
+                onChange={(e) => setHostelBlock(e.target.value)}
+                className="w-full bg-slate-50 border border-emerald-100 rounded-xl p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                required
+              />
             </div>
             <div>
-              <label className="block text-gray-400 text-xs mb-1">Room Number</label>
-              <input type="text" placeholder="402" className="w-full bg-[#050816] border border-gray-700 rounded-xl p-3 text-white focus:outline-none focus:border-[#00D4FF] transition-colors" />
+              <label className="block text-slate-700 text-xs mb-1 font-medium">
+                Room Number
+              </label>
+              <input
+                type="text"
+                value={roomNo}
+                onChange={(e) => setRoomNo(e.target.value)}
+                className="w-full bg-slate-50 border border-emerald-100 rounded-xl p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                required
+              />
             </div>
           </div>
 
+          {/* Email */}
           <div>
-            <label className="block text-gray-400 text-xs mb-1">Email Address</label>
-            <input type="email" placeholder="student@university.edu" className="w-full bg-[#050816] border border-gray-700 rounded-xl p-3 text-white focus:outline-none focus:border-[#00D4FF] transition-colors" />
-          </div>
-          
-          <div>
-            <label className="block text-gray-400 text-xs mb-1">Password</label>
-            <input type="password" placeholder="••••••••" className="w-full bg-[#050816] border border-gray-700 rounded-xl p-3 text-white focus:outline-none focus:border-[#00D4FF] transition-colors" />
+            <label className="block text-slate-700 text-xs mb-1 font-medium">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-50 border border-emerald-100 rounded-xl p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              required
+            />
           </div>
 
-          <Link to="/student-dashboard" className="block mt-6">
-            <motion.button 
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#00D4FF] to-blue-600 font-bold text-white shadow-[0_0_15px_rgba(0,212,255,0.3)] transition-all"
-            >
-              Sign Up
-            </motion.button>
-          </Link>
+          {/* Password */}
+          <div>
+            <label className="block text-slate-700 text-xs mb-1 font-medium">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-slate-50 border border-emerald-100 rounded-xl p-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              required
+            />
+          </div>
 
+          {/* Submit */}
+          <motion.button
+            type="submit"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-blue-600 font-bold text-white shadow-lg transition-all"
+          >
+            Sign Up
+          </motion.button>
+
+          {/* Login Link */}
           <div className="text-center mt-4">
-            <p className="text-sm text-gray-400">
-              Already have an account? <Link to="/login" className="text-[#00D4FF] hover:underline">Log in</Link>
+            <p className="text-sm text-slate-500">
+              Already have an account?{' '}
+              <Link to="/login" className="text-emerald-600 font-bold">
+                Log in
+              </Link>
             </p>
           </div>
         </form>

@@ -1,36 +1,33 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  font-family: 'Inter', sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color-scheme: dark;
-  background-color: #050816;
+@theme {
+  --color-offWhite: #E6E6E6;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #050816;
-  color: #ffffff;
+@layer base {
+  body {
+    @apply bg-[#050816] text-offWhite font-sans antialiased;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar {
+.custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }
-::-webkit-scrollbar-track {
+
+.custom-scrollbar::-webkit-scrollbar-track {
   background: #050816;
 }
-::-webkit-scrollbar-thumb {
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
   background: #0F172A;
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #00D4FF;
 }
