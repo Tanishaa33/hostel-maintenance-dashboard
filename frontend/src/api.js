@@ -1,4 +1,5 @@
 import axios from "axios";
+<<<<<<< HEAD
 
 const API = axios.create({
   baseURL: "http://localhost:5000/api",
@@ -14,5 +15,33 @@ API.interceptors.request.use((req) => {
 
   return req;
 });
+=======
+import { auth } from "./firebase/firebase.js";
+
+const API = axios.create({
+  baseURL: "http://localhost:5000",
+});
+
+// Attach Firebase token safely
+API.interceptors.request.use(
+  async (config) => {
+    try {
+      const user = auth?.currentUser;
+
+      if (user) {
+        const token = await user.getIdToken();
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (err) {
+      console.log("Auth error:", err.message);
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+>>>>>>> 567fc3e (final-commit)
 
 export default API;
