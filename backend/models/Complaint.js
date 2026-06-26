@@ -1,21 +1,55 @@
 import mongoose from "mongoose";
 
-const complaintSchema = new mongoose.Schema({
-  uid: String,
-  title: String,
-  category: String,
-  description: String,
-  status: {
-    type: String,
-    default: "Pending",
-  },
-  priority: {
-    type: String,
-    default: "Medium",
-  },
-});
+const complaintSchema = new mongoose.Schema(
+  {
+    uid: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-// prevent overwrite in dev
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    roomNo: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    status: {
+      type: String,
+      enum: ["Pending", "In Progress", "Resolved"],
+      default: "Pending",
+    },
+
+    priority: {
+      type: String,
+      enum: ["Low", "Medium", "High", "Critical"],
+      default: "Medium",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Prevent model overwrite during development
 const Complaint =
   mongoose.models.Complaint ||
   mongoose.model("Complaint", complaintSchema);

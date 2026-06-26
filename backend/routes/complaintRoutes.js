@@ -1,40 +1,45 @@
-<<<<<<< HEAD
-const express = require("express");
-const router = express.Router();
-
-const {
-  createComplaint,
-  getComplaints,
-} = require("../controllers/complaintController");
-
-const protect = require("../middleware/authMiddleware");
-
-router.post("/", protect, createComplaint);
-router.get("/", protect, getComplaints);
-
-module.exports = router;
-=======
 import express from "express";
 import {
   createComplaint,
   getComplaints,
+  getComplaintById,
   updateComplaintStatus,
   deleteComplaint,
 } from "../controllers/complaintController.js";
 
+import verifyUser from "../middleware/firebaseAuth.js";
+
 const router = express.Router();
 
-// ✅ GET ALL COMPLAINTS
+// =========================================
+// PUBLIC ROUTES
+// =========================================
+
+// Test Route
+router.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Complaint API Working",
+  });
+});
+
+// Landing Page Statistics
 router.get("/", getComplaints);
 
-// ✅ CREATE COMPLAINT
-router.post("/", createComplaint);
+// =========================================
+// PROTECTED ROUTES
+// =========================================
 
-// ✅ UPDATE STATUS
-router.put("/:id", updateComplaintStatus);
+// Create Complaint
+router.post("/", verifyUser, createComplaint);
 
-// ✅ DELETE COMPLAINT
-router.delete("/:id", deleteComplaint);
+// Get Single Complaint
+router.get("/:id", verifyUser, getComplaintById);
+
+// Update Complaint Status
+router.put("/:id", verifyUser, updateComplaintStatus);
+
+// Delete Complaint
+router.delete("/:id", verifyUser, deleteComplaint);
 
 export default router;
->>>>>>> 567fc3e (final-commit)

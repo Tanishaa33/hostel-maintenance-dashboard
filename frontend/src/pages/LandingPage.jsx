@@ -26,19 +26,32 @@ const LandingPage = () => {
   }, []);
 
   const fetchStats = async () => {
-    try {
-      const res = await API.get('/complaints');
-      const complaints = res.data;
-      setStats({
-        totalComplaints: complaints.length,
-        pending: complaints.filter((c) => c.status === 'Pending').length,
-        resolved: complaints.filter((c) => c.status === 'Resolved').length,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  try {
+    const res = await API.get("/complaints");
 
+    // Backend returns { success: true, data: [...] }
+    const complaints = res.data?.data || [];
+
+    setStats({
+      totalComplaints: complaints.length,
+      pending: complaints.filter(
+        (c) => c.status === "Pending"
+      ).length,
+      resolved: complaints.filter(
+        (c) => c.status === "Resolved"
+      ).length,
+    });
+  } catch (error) {
+    console.error("Fetch Stats Error:", error);
+
+    // Keep UI working even if backend fails
+    setStats({
+      totalComplaints: 0,
+      pending: 0,
+      resolved: 0,
+    });
+  }
+};
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.2 } }

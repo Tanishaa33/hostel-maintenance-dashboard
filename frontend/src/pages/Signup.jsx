@@ -1,52 +1,12 @@
-<<<<<<< HEAD
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate, Link } from 'react-router-dom';
-import API from '../api';
-=======
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../firebase/firebase";
->>>>>>> 567fc3e (final-commit)
 
 const Signup = () => {
   const navigate = useNavigate();
 
-<<<<<<< HEAD
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('student');
-  const [hostelBlock, setHostelBlock] = useState('');
-  const [roomNo, setRoomNo] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleSignup = async () => {
-    try {
-      await API.post('/auth/register', {
-        name,
-        email,
-        password,
-        role,
-        hostelBlock,
-        roomNo,
-      });
-
-      alert('Registration Successful');
-
-      setName('');
-      setEmail('');
-      setPassword('');
-      setHostelBlock('');
-      setRoomNo('');
-      setRole('student');
-
-      navigate('/login');
-    } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || 'Registration Failed');
-=======
   const [name, setName] = useState("");
   const [role, setRole] = useState("student");
   const [hostelBlock, setHostelBlock] = useState("");
@@ -105,16 +65,12 @@ const Signup = () => {
       setError(error.message);
     } finally {
       setLoading(false);
->>>>>>> 567fc3e (final-commit)
     }
   };
 
   return (
     <div className="min-h-screen bg-emerald-50 flex items-center justify-center relative overflow-hidden py-10">
-<<<<<<< HEAD
-=======
 
->>>>>>> 567fc3e (final-commit)
       {/* Background Orbs */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-200/30 blur-[120px] rounded-full pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-200/30 blur-[120px] rounded-full pointer-events-none"></div>
@@ -124,10 +80,7 @@ const Signup = () => {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-lg bg-white border border-emerald-100 p-8 rounded-3xl z-10 shadow-xl mx-4"
       >
-<<<<<<< HEAD
-=======
         {/* Title */}
->>>>>>> 567fc3e (final-commit)
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-slate-900 mb-2">
             Create Account
@@ -158,10 +111,7 @@ const Signup = () => {
                 required
               />
             </div>
-<<<<<<< HEAD
-=======
 
->>>>>>> 567fc3e (final-commit)
             <div>
               <label className="block text-slate-700 text-xs mb-1 font-medium">
                 Role
@@ -191,10 +141,7 @@ const Signup = () => {
                 required
               />
             </div>
-<<<<<<< HEAD
-=======
 
->>>>>>> 567fc3e (final-commit)
             <div>
               <label className="block text-slate-700 text-xs mb-1 font-medium">
                 Room Number
@@ -240,19 +187,6 @@ const Signup = () => {
           {/* Submit */}
           <motion.button
             type="submit"
-<<<<<<< HEAD
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-blue-600 font-bold text-white shadow-lg transition-all"
-          >
-            Sign Up
-          </motion.button>
-
-          {/* Login Link */}
-          <div className="text-center mt-4">
-            <p className="text-sm text-slate-500">
-              Already have an account?{' '}
-=======
             disabled={loading}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -270,7 +204,6 @@ const Signup = () => {
           <div className="text-center mt-4">
             <p className="text-sm text-slate-500">
               Already have an account?{" "}
->>>>>>> 567fc3e (final-commit)
               <Link to="/login" className="text-emerald-600 font-bold">
                 Log in
               </Link>

@@ -65,8 +65,8 @@ const StudentDashboard = () => {
       }
 
       const res = await API.post('/complaints', formData);
-      const complaint = res.data;
-
+      const complaint = res.data.data;
+      
       setTimeout(() => {
         setAnalyzing(false);
         setAiAnalysis({

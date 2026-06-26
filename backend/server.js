@@ -1,100 +1,85 @@
-<<<<<<< HEAD
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
+// server.js
 
-const connectDB = require("./config/db");
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
 
+import connectDB from "./config/db.js";
+
+// Import Firebase Admin (initializes Firebase)
+import "./config/firebaseAdmin.js";
+
+// Import Routes
+import authRoutes from "./routes/authRoutes.js";
+import complaintRoutes from "./routes/complaintRoutes.js";
+
+// Load environment variables
 dotenv.config();
+
+// Connect MongoDB
 connectDB();
 
 const app = express();
 
-/* ✅ IMPORTANT: CORS CONFIG (fix frontend issues) */
+/* =======================
+   CORS Configuration
+======================= */
 app.use(
   cors({
-    origin: "http://localhost:5173", // Vite frontend
+    origin: "*", // Change to your frontend URL in production
     credentials: true,
   })
 );
 
-/* middleware */
+/* =======================
+   Middleware
+======================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* routes */
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/complaints", require("./routes/complaintRoutes"));
+/* =======================
+   API Routes
+======================= */
+app.use("/api/auth", authRoutes);
+app.use("/api/complaints", complaintRoutes);
 
-/* test route */
+/* =======================
+   Health Check
+======================= */
 app.get("/", (req, res) => {
   res.status(200).json({
-    message: "AI Hostel Dashboard API Running 🚀",
+    success: true,
+    message: "🚀 AI Hostel Dashboard API is Running",
   });
 });
 
-/* handle invalid routes */
+/* =======================
+   404 Handler
+======================= */
 app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
-
-/* error handler */
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    message: "Server Error",
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
   });
 });
 
-/* start server */
+/* =======================
+   Global Error Handler
+======================= */
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err.stack);
+
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error",
+  });
+});
+
+/* =======================
+   Start Server
+======================= */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
-=======
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import complaintRoutes from "./routes/complaintRoutes.js";
-
-const app = express();
-
-// 🔥 MIDDLEWARE
-app.use(cors());
-app.use(express.json());
-
-// 🔥 HEALTH CHECK ROUTE (important for debugging)
-app.get("/", (req, res) => {
-  res.send("Server is running 🚀");
-});
-
-// 🔥 ROUTES
-app.use("/complaints", complaintRoutes);
-
-// 🔥 ERROR HANDLER (IMPORTANT)
-app.use((err, req, res, next) => {
-  console.error("🔥 SERVER ERROR:", err.message);
-  res.status(500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
-
-// 🔥 MONGODB CONNECTION (FIXED + SAFE)
-mongoose
-  .connect(
-    "mongodb+srv://hostel-management:management%40123@cluster0.p1psjhg.mongodb.net/hostelDB?retryWrites=true&w=majority"
-  )
-  .then(() => {
-    console.log("✅ MongoDB Connected");
-
-    // 🔥 START SERVER ONLY AFTER DB CONNECTS
-    app.listen(5000, () => {
-      console.log("🚀 Server running on port 5000");
-    });
-  })
-  .catch((err) => {
-    console.error("❌ MongoDB Connection Failed:", err);
-  });
->>>>>>> 567fc3e (final-commit)

@@ -1,33 +1,47 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const complaintSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     uid: {
       type: String,
       required: true,
+      unique: true,
+      trim: true,
     },
-    title: {
+
+    name: {
       type: String,
       required: true,
+      trim: true,
     },
-    category: {
+
+    email: {
       type: String,
       required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
-    description: {
+
+    password: {
       type: String,
-      required: true,
+      default: null,
     },
-    status: {
+
+    role: {
       type: String,
-      default: "Pending",
-    },
-    priority: {
-      type: String,
-      default: "Medium",
+      enum: ["student", "admin"],
+      default: "student",
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-module.exports = mongoose.model("Complaint", complaintSchema);
+// Prevent model overwrite during development
+const User =
+  mongoose.models.User ||
+  mongoose.model("User", userSchema);
+
+export default User;

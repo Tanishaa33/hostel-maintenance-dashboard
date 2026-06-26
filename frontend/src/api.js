@@ -1,25 +1,8 @@
 import axios from "axios";
-<<<<<<< HEAD
-
-const API = axios.create({
-  baseURL: "http://localhost:5000/api",
-});
-
-// 🔥 AUTO ADD TOKEN TO EVERY REQUEST
-API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return req;
-});
-=======
 import { auth } from "./firebase/firebase.js";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "http://localhost:5000/api",
 });
 
 // Attach Firebase token safely
@@ -42,6 +25,5 @@ API.interceptors.request.use(
     return Promise.reject(error);
   }
 );
->>>>>>> 567fc3e (final-commit)
 
 export default API;
